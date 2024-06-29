@@ -16,6 +16,10 @@ const db = require('./models');
 
 
 // Routers
+const studentRouter = require('./routes/Student');
+app.use("/student", studentRouter);
+const teacherRouter = require('./routes/Teacher');
+app.use("/teacher", teacherRouter);
 ////////////////////
 
 

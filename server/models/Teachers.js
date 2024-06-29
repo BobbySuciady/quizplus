@@ -1,14 +1,16 @@
-// Make table in mysql
-module.exports = (sequelize, Datatypes) => {
+module.exports = (sequelize, DataTypes) => {
     const Teachers = sequelize.define("Teachers", {
-        username : {
-            type: Datatypes.STRING,
+        username: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
-        password : {
-            type: Datatypes.STRING,
+        password: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
-    })
+    }, {
+        timestamps: false
+    });
+
     return Teachers;
-}
+};
