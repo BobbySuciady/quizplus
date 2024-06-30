@@ -16,7 +16,6 @@ function TeacherLogin() {
                 if (response.data.error) {
                     alert(response.data.error);
                 } else {
-                    console.log(response.data.id)
                     navigate(`/teacher/${response.data.id}`);
                 }
             }).catch(error => {

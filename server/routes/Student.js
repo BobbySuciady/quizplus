@@ -44,7 +44,19 @@ router.post("/login", async (req, res) => {
 });
 
 router.get('/auth', validateToken, (req, res) => {
-    res.json(req.user);
+    const { id } = req.user; 
+    res.json({ studentId: id });
+});
+
+router.get('/:studentId', validateToken, (req, res) => {
+    const { studentId } = req.params;
+    const { id } = req.query.siteId;
+
+    // Check if the authenticated user matches the requested teacherId
+    if (Number(id) !== Number(studentId)) {
+        return res.status(403).json({ error: "Unauthorized access" });
+    }
+    res.json({ message: `Access granted for studentId ${studentId}` });
 });
 
 module.exports = router;
