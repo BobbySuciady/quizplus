@@ -13,14 +13,17 @@ function TeacherLogin() {
         const data = { username: username, password: password };
         axios.post(`http://localhost:3001/teacher/login`, data, { withCredentials: true }) // Ensure cookies are sent with the request
             .then((response) => {
+                console.log(response.data)
                 if (response.data.error) {
                     alert(response.data.error);
                 } else {
+                    console.log(response.data.id)
                     navigate(`/teacher/${response.data.id}`);
+                    
                 }
             }).catch(error => {
                 console.error("Login failed:", error);
-                alert("Login failed. Please try again."); // Handle login failure
+                alert("Login failed. Please try again."); 
             });
     };
 

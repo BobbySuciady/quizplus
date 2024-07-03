@@ -5,7 +5,7 @@ import StudentHome from './pages/StudentHome';
 import StudentSignup from './pages/StudentSignup';
 import TeacherLogin from './pages/TeacherLogin';
 import TeacherHome from './pages/TeacherHome';
-import { useEffect } from 'react';
+import CreateQuiz from './pages/CreateQuiz';
 
 function App() {
   
@@ -21,6 +21,7 @@ function App() {
           <Route path='/signup' element={<StudentSignup />} />
           <Route path='/teacher/login' element={<TeacherLogin/>}/>
           <Route path='/teacher/:id' element={<TeacherHome/>}/>
+          <Route path='/createquiz' element={<CreateQuiz/>}/>
         </Route>
       </Routes>
     </Router>

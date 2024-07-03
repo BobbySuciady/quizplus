@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const {Students} = require('../models');
+const {Student} = require('../models');
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const cookieParser = require('cookie-parser');
@@ -11,7 +11,7 @@ router.post("/signup", async (req, res) => {
     try {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
-        await Students.create({ username, password: hash });
+        await Student.create({ username, password: hash });
         res.json("SUCCESS");
     } catch (error) {
         console.error(error);
@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
-    const user = await Students.findOne({ where: { username: username } });
+    const user = await Student.findOne({ where: { username: username } });
     const stayLoggedInDays = 3;
 
     if (!user) {

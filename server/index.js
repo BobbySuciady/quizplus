@@ -15,11 +15,14 @@ app.use(cookieParser());
 const db = require('./models');
 
 
+
 // Routers
 const studentRouter = require('./routes/Student');
 app.use("/student", studentRouter);
 const teacherRouter = require('./routes/Teacher');
 app.use("/teacher", teacherRouter);
+const quizRouter = require('./routes/Quiz');
+app.use("/quiz", quizRouter);
 ////////////////////
 
 

@@ -1,14 +1,24 @@
-// Make table in mysql
-module.exports = (sequelize, Datatypes) => {
-    const Students = sequelize.define("Students", {
-        username : {
-            type: Datatypes.STRING,
-            allowNull: false,
-        },
-        password : {
-            type: Datatypes.STRING,
-            allowNull: false,
-        },
-    })
-    return Students;
-}
+// models/Student.js
+module.exports = (sequelize, DataTypes) => {
+    const Student = sequelize.define("Student", {
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    });
+  
+    Student.associate = (models) => {
+      Student.belongsToMany(models.Subject, {
+        through: 'StudentSubjects',
+        foreignKey: 'studentId',
+        as: 'subjects',
+      });
+    };
+  
+    return Student;
+  };
+  

@@ -1,16 +1,25 @@
+// models/Quiz.js
 module.exports = (sequelize, DataTypes) => {
-    const Quiz = sequelize.define('Quiz', {
-        title: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        teacherId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-      });
-      return Quiz;
-}
+  const Quiz = sequelize.define("Quiz", {
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    subjectId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    teacherId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  });
 
+  Quiz.associate = (models) => {
+    Quiz.belongsTo(models.Subject, { foreignKey: 'subjectId', as: 'subject' });
+    Quiz.belongsTo(models.Teacher, { foreignKey: 'teacherId', as: 'teacher' });
+    Quiz.hasMany(models.Question, { foreignKey: 'quizId', as: 'questions' });
+  };
 
-
+  return Quiz;
+};

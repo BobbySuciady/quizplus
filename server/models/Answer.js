@@ -8,10 +8,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      isCorrect: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-      },
     });
   
     return Answer;

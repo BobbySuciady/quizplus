@@ -20,7 +20,7 @@ function StudentLogin() {
                 }
             }).catch(error => {
                 console.error("Login failed:", error);
-                alert("Login failed. Please try again."); // Handle login failure
+                alert("Login failed. Please try again.");
             });
     };
 
