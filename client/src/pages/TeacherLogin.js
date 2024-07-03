@@ -31,7 +31,7 @@ function TeacherLogin() {
         </div>
         <form className="login-form">
             <div className="form-group">
-                <label>Student Email</label>
+                <label>Teacher Email</label>
                 <input onChange={(event) => setUsername(event.target.value)} type="text" />
             </div>
             <div className="form-group">
