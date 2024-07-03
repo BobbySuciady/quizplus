@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
 .App {
   text-align: center;
 }
@@ -40,10 +38,10 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(-45deg, #007BFF, #00aaff, #00d4ff, #00aaff, #0056b3);
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(-45deg, #004080, #007BFF, #00aaff, #00d4ff, #007BFF, #004080); /* Adjusted blue gradient */
     background-size: 400% 400%;
-    animation: gradientBG 30s ease infinite;
+    animation: gradientBG 30s linear infinite;
     margin: 0;
     padding: 0;
     display: flex;
@@ -56,11 +54,8 @@ body {
     0% {
         background-position: 0% 50%;
     }
-    50% {
-        background-position: 100% 50%;
-    }
     100% {
-        background-position: 0% 50%;
+        background-position: 100% 50%;
     }
 }
 
