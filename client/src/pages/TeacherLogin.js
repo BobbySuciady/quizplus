@@ -26,9 +26,9 @@ function TeacherLogin() {
 
   return (
     <div className='loginContainer'>
-        <label>Username:</label>
+        <label>Student Email</label>
         <input onChange={(event) => setUsername(event.target.value)} type='text' />
-        <label>Password:</label>
+        <label>Password</label>
         <input onChange={(event) => setPassword(event.target.value)} type='password' />
         <button onClick={login}>Login</button>
     </div>
