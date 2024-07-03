@@ -25,12 +25,22 @@ function TeacherLogin() {
     };
 
   return (
-    <div className='loginContainer'>
-        <label>Student Email</label>
-        <input onChange={(event) => setUsername(event.target.value)} type='text' />
-        <label>Password</label>
-        <input onChange={(event) => setPassword(event.target.value)} type='password' />
-        <button onClick={login}>Login</button>
+    <div className="login-container">
+        <div className="logo-container">
+            <img src={logo} alt="Quizplus Logo" className="logo" />
+        </div>
+        <form className="login-form">
+            <div className="form-group">
+                <label>Student Email</label>
+                <input onChange={(event) => setUsername(event.target.value)} type="text" />
+            </div>
+            <div className="form-group">
+                <label>Password</label>
+                <input onChange={(event) => setPassword(event.target.value)} type="password" />
+            </div>
+            <button className="login-button" onClick={login}>Login</button>
+            <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
+        </form>
     </div>
   )
 }
