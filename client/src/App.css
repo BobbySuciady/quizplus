@@ -59,6 +59,7 @@ body {
     }
 }
 
+/* ////////////////// Login Forms  /////////////////////*/
 .login-container {
     background-color: rgba(255, 255, 255, 0.9); /* Slight transparency to see the background animation */
     padding: 30px;
@@ -138,4 +139,36 @@ p a {
 
 p a:hover {
     text-decoration: underline;
+}
+
+
+/* ////////////////// StudentHome.css  /////////////////////*/
+.quiz-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.quiz-card:hover {
+  transform: translateY(-5px);
+}
+
+.quiz-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.quiz-card p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.quizzes-container {
+  display: flex;
+  flex-direction: column;
 }
