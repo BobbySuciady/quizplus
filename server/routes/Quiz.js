@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Quiz, Question, Answer, Subject } = require('../models');
+const { Quiz, Question, Answer, Subject, StudentAnswer } = require('../models');
 const { validateToken } = require('../middleware/AuthMiddleware');
 
 router.post('/create', validateToken, async (req, res) => {
@@ -47,5 +47,26 @@ router.get('/:id', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.post('/submit/:id', validateToken, async (req, res) => {
+  const { answers } = req.body;
+  const studentId = req.user.id;
+
+  try {
+      for (const answer of answers) {
+          await StudentAnswer.create({
+              studentId,
+              questionId: answer.questionId,
+              answer: answer.text
+          });
+      }
+
+      res.status(200).json({ message: 'Quiz submitted successfully' });
+  } catch (error) {
+      console.error('Error submitting quiz:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;
