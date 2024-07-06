@@ -10,6 +10,19 @@ function StudentHome() {
     const [studentData, setStudentData] = useState("")
     const siteId = useParams(); //returns {id: }
 
+    const QuizCard = ({ quiz }) => {
+      const handleCardClick = () => {
+          navigate(`/quiz/${quiz.id}`);
+      };
+      return (
+          <div className="quiz-card" onClick={handleCardClick}>
+              <h2>{quiz.title}</h2>
+              <p>Subject ID: {quiz.subjectId}</p>
+              <p>Teacher ID: {quiz.teacherId}</p>
+          </div>
+      );
+  };
+
     useEffect(() => {
       axios.get("http://localhost:3001/student/auth", { withCredentials: true })
           .then((response) => {
@@ -32,7 +45,14 @@ function StudentHome() {
 
   return (
     <div>
-      {studentData.message}
+      <h1>Welcome, Student</h1>
+
+      <div className="quizzes-container">
+        {studentData.quizzes && studentData.quizzes.map((quiz) => (
+          <QuizCard key={quiz.id} quiz={quiz} />
+        ))}
+      </div>
+
     </div>
   )
 }

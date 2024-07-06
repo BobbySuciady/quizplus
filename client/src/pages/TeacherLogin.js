@@ -33,7 +33,6 @@ function TeacherLogin() {
         <div className="logo-container">
             <img src={logo} alt="Quizplus Logo" className="logo" />
         </div>
-        <form className="login-form">
             <div className="form-group">
                 <label>Teacher Email</label>
                 <input onChange={(event) => setUsername(event.target.value)} type="text" />
@@ -44,7 +43,6 @@ function TeacherLogin() {
             </div>
             <button className="login-button" onClick={login}>Login</button>
             <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
-        </form>
     </div>
   )
 }

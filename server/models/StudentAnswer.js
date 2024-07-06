@@ -1,19 +1,24 @@
+// models/StudentAnswer.js
 module.exports = (sequelize, DataTypes) => {
-    const StudentAnswer = sequelize.define('StudentAnswer', {
+  const StudentAnswer = sequelize.define('StudentAnswer', {
       studentId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+          type: DataTypes.INTEGER,
+          allowNull: false,
       },
       questionId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+          type: DataTypes.INTEGER,
+          allowNull: false,
       },
-      answerId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      answer: { 
+          type: DataTypes.STRING,
+          allowNull: false,
       },
-    });
-  
-    return StudentAnswer;
+  });
+
+  StudentAnswer.associate = (models) => {
+      StudentAnswer.belongsTo(models.Student, { foreignKey: 'studentId', as: 'student' });
+      StudentAnswer.belongsTo(models.Question, { foreignKey: 'questionId', as: 'question' });
   };
-  
+
+  return StudentAnswer;
+};
