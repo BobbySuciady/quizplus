@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 .App {
   text-align: center;
 }
@@ -41,7 +43,7 @@ body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(-45deg, #004080, #007BFF, #00aaff, #00d4ff, #007BFF, #004080); /* Adjusted blue gradient */
     background-size: 400% 400%;
-    animation: gradientBG 30s linear infinite;
+    animation: gradientBG 30s ease infinite; /* Back-and-forth animation */
     margin: 0;
     padding: 0;
     display: flex;
@@ -54,8 +56,11 @@ body {
     0% {
         background-position: 0% 50%;
     }
-    100% {
+    50% {
         background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
 
