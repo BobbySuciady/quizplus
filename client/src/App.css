@@ -50,6 +50,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden; /* Hide overflow to prevent unwanted scrolling */
 }
 
 @keyframes gradientBG {
@@ -176,4 +177,46 @@ p a:hover {
 .quizzes-container {
   display: flex;
   flex-direction: column;
+}
+
+.quiz-card.locked {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.lock-message {
+  color: red;
+  font-weight: bold;
+}
+
+/* TeacherHome.css */
+.quizzes-container {
+  max-height: 70vh; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiz-card {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.quiz-card:hover {
+  transform: scale(1.05);
+}
+
+.quiz-card h4 {
+  margin: 0 0 8px 0;
+}
+
+.quiz-card p {
+  margin: 4px 0;
 }

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const { Teacher, Subject } = require('../models');
+const { Teacher, Subject, Quiz, StudentResult } = require('../models');
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middleware/AuthMiddleware');
 
@@ -48,18 +48,35 @@ router.get('/auth', validateToken, (req, res) => {
 
 router.get('/:teacherId', validateToken, async (req, res) => {
     const { teacherId } = req.params;
-    const siteId = req.query.siteId;
+    const { siteId } = req.query;
 
     // Check if the authenticated user matches the requested teacherId
     if (Number(siteId) !== Number(teacherId)) {
         return res.status(403).json({ error: "Unauthorized access" });
     }
+
     try {
-        const teacher = await Teacher.findByPk(teacherId);
-        if (!teacher) {
-            return res.status(404).json({ error: "Teacher not found" });
+        const quizzes = await Quiz.findAll({
+            where: { teacherId: teacherId },
+            include: {
+              model: StudentResult,
+              as:'results',
+              attributes: ['id'], // Just check if there are any results
+            },
+          });
+        if (!quizzes) {
+            return res.json("no quizzes")
         }
-        res.json({ message: `Access granted for teacherId ${teacherId}`, data: teacher });
+
+        const quizzesWithStatus = quizzes.map(quiz => ({
+            id: quiz.id,
+            title: quiz.title,
+            subjectId: quiz.subjectId,
+            graded: quiz.results.length > 0, // Check if there are any grading results
+          }));
+
+        res.json({ message: `Access granted for teacherId ${teacherId}`, data: quizzesWithStatus });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error fetching teacher data" });
@@ -79,7 +96,6 @@ router.get('/subjects/:teacherId', validateToken, async (req, res) => {
                 through: 'TeacherSubjects', 
             }], 
         });
-        console.log(subjects.subjectId)
 
         res.json(subjects);
     } catch (error) {

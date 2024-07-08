@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const {Student, Subject, Quiz} = require('../models');
+const {Student, Subject, Quiz, Question, StudentAnswer, StudentResult} = require('../models');
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const cookieParser = require('cookie-parser');
@@ -62,9 +62,10 @@ router.get('/:studentId', validateToken, async (req, res) => {
                 model: Student,
                 as: 'students',
                 where: { id: studentId },
-                through: 'StudentSubjects', 
-            }], 
+                through: 'StudentSubjects',
+            }],
         });
+
         const subjectIds = studentSubjects.map(subject => subject.subjectId);
 
         // Fetch quizzes for the subjects
@@ -72,14 +73,36 @@ router.get('/:studentId', validateToken, async (req, res) => {
             where: { subjectId: subjectIds },
         });
 
-        res.json({ subjects: studentSubjects, quizzes: studentQuizzes });
+        // Fetch submission status and grades for each quiz
+        const quizzesWithStatus = await Promise.all(studentQuizzes.map(async (quiz) => {
+            const submission = await StudentAnswer.findOne({
+                where: {
+                    studentId: studentId,
+                    quizId: quiz.id
+                }
+            });
+
+            const grade = await StudentResult.findOne({
+                where: {
+                    studentId: studentId,
+                    quizId: quiz.id
+                }
+            });
+
+            return {
+                ...quiz.dataValues,
+                submitted: !!submission,
+                grade: grade ? grade.score : null
+            };
+        }));
+
+        res.json({ subjects: studentSubjects, quizzes: quizzesWithStatus });
 
     } catch (error) {
-        console.error('Error fetching subjects:', error);
-        res.status(500).json({ error: 'Error fetching subjects' });
+        console.error('Error fetching subjects and quizzes:', error);
+        res.status(500).json({ error: 'Error fetching subjects and quizzes' });
     }
-
-
 });
+
 
 module.exports = router;
