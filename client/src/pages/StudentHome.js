@@ -9,9 +9,10 @@ function StudentHome() {
 
     const QuizCard = ({ quiz }) => {
         const handleCardClick = () => {
-            if (!quiz.submitted) {
-                navigate(`/quiz/${quiz.id}`);
-            }
+            // if (!quiz.submitted) {
+            //     navigate(`/quiz/${quiz.id}`);
+            // }
+            navigate(`/quiz/${quiz.id}`);
         };
 
         return (

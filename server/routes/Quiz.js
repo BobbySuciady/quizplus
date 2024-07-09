@@ -28,24 +28,37 @@ router.post('/create', validateToken, async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateToken, async (req, res) => {
+  const {id : quizId} = req.params
+  const {id: studentId} = req.user
   try {
-      const quiz = await Quiz.findOne({
-        where: { id: req.params.id },
-        include: [
-            { model: Question, as: 'questions' }, 
-        ]
-      });
-      
-      if (!quiz) {
-          return res.status(404).json({ error: 'Quiz not found' });
-      }
+    const quiz = await Quiz.findOne({
+        where: { id: quizId },
+        include: [{
+            model: Question,
+            as: 'questions'
+        }]
+    });
 
-      res.json(quiz);
-  } catch (error) {
-      console.error('Error fetching quiz:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
+    if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+    }
+
+    const studentAnswers = await StudentAnswer.findAll({
+        where: {
+            studentId: studentId,
+            quizId: quizId
+        }
+    });
+
+    res.json({
+        quiz,
+        studentAnswers
+    });
+} catch (error) {
+    console.error('Error fetching quiz details:', error);
+    res.status(500).json({ error: 'Error fetching quiz details' });
+}
 });
 
 router.post('/submit/:id', validateToken, async (req, res) => {
@@ -79,7 +92,7 @@ router.post('/:quizId/grade', async (req, res) => {
     if (existingResults) {
       return res.status(400).json({ message: "This quiz has already been graded." });
     }
-    
+
     // Find all questions for the quiz
     const questions = await Question.findAll({ where: { quizId } });
     console.log(questions)
@@ -104,8 +117,11 @@ router.post('/:quizId/grade', async (req, res) => {
         }
         // Check if the student's answer text matches the correct answer text
         const correctAnswer = correctAnswers.find(ans => ans.questionId === studentAnswer.questionId);
-        if (correctAnswer && studentAnswer.answer === correctAnswer.text) {
-            grades[studentAnswer.studentId] += 1; // Increment grade for correct answer
+        const isCorrect = correctAnswer && studentAnswer.answer === correctAnswer.text;
+        studentAnswer.isCorrect = isCorrect;
+        studentAnswer.save();
+        if (isCorrect) {
+            grades[studentAnswer.studentId] += 1;
         }
     });
     console.log(grades)
@@ -133,6 +149,9 @@ router.post('/:quizId/grade', async (req, res) => {
       res.status(500).json({ error: "Error grading quiz" });
   }
 });
+
+
+
 
 
 module.exports = router;
