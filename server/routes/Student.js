@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const {Student} = require('../models');
+const {Student, Subject, Quiz, Question, StudentAnswer, StudentResult} = require('../models');
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const cookieParser = require('cookie-parser');
@@ -48,15 +48,61 @@ router.get('/auth', validateToken, (req, res) => {
     res.json({ studentId: id });
 });
 
-router.get('/:studentId', validateToken, (req, res) => {
+router.get('/:studentId', validateToken, async (req, res) => {
     const { studentId } = req.params;
     const { id } = req.query.siteId;
 
-    // Check if the authenticated user matches the requested teacherId
     if (Number(id) !== Number(studentId)) {
         return res.status(403).json({ error: "Unauthorized access" });
     }
-    res.json({ message: `Access granted for studentId ${studentId}` });
+
+    try {
+        const studentSubjects = await Subject.findAll({
+            include: [{
+                model: Student,
+                as: 'students',
+                where: { id: studentId },
+                through: 'StudentSubjects',
+            }],
+        });
+
+        const subjectIds = studentSubjects.map(subject => subject.subjectId);
+
+        // Fetch quizzes for the subjects
+        const studentQuizzes = await Quiz.findAll({
+            where: { subjectId: subjectIds },
+        });
+
+        // Fetch submission status and grades for each quiz
+        const quizzesWithStatus = await Promise.all(studentQuizzes.map(async (quiz) => {
+            const submission = await StudentAnswer.findOne({
+                where: {
+                    studentId: studentId,
+                    quizId: quiz.id
+                }
+            });
+
+            const grade = await StudentResult.findOne({
+                where: {
+                    studentId: studentId,
+                    quizId: quiz.id
+                }
+            });
+
+            return {
+                ...quiz.dataValues,
+                submitted: !!submission,
+                grade: grade ? grade.score : null
+            };
+        }));
+
+        res.json({ subjects: studentSubjects, quizzes: quizzesWithStatus });
+
+    } catch (error) {
+        console.error('Error fetching subjects and quizzes:', error);
+        res.status(500).json({ error: 'Error fetching subjects and quizzes' });
+    }
 });
+
 
 module.exports = router;

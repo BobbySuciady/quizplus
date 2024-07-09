@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     });
+    Question.associate = (models) => {
+      Question.belongsTo(models.Quiz, { foreignKey: 'quizId', as: 'quiz' });
+    };
   
     return Question;
   };

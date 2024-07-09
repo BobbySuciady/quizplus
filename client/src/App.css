@@ -40,16 +40,16 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(-45deg, #007BFF, #00aaff, #00d4ff, #00aaff, #0056b3);
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(-45deg, #004080, #007BFF, #00aaff, #00d4ff, #007BFF, #004080); /* Adjusted blue gradient */
     background-size: 400% 400%;
-    animation: gradientBG 30s ease infinite;
+    animation: gradientBG 30s ease infinite; /* Back-and-forth animation */
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    overflow-y: auto; /* Allow vertical scrolling */
 }
 
 @keyframes gradientBG {
@@ -64,6 +64,7 @@ body {
     }
 }
 
+/* Login Forms */
 .login-container {
     background-color: rgba(255, 255, 255, 0.9); /* Slight transparency to see the background animation */
     padding: 30px;
@@ -144,3 +145,76 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+
+/* StudentHome.css */
+.quiz-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.quiz-card:hover {
+  transform: translateY(-5px);
+}
+
+.quiz-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.quiz-card p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.quizzes-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-card.locked {
+  background-color: #e0e0e0;
+}
+
+.lock-message {
+  color: red;
+  font-weight: bold;
+}
+
+/* TeacherHome.css */
+.quizzes-container {
+  max-height: 70vh; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiz-card {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.quiz-card:hover {
+  transform: scale(1.05);
+}
+
+.quiz-card h4 {
+  margin: 0 0 8px 0;
+}
+
+.quiz-card p {
+  margin: 4px 0;
+}
+

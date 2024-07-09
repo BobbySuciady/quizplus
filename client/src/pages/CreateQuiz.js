@@ -9,25 +9,20 @@ function CreateQuiz() {
 
   useEffect(() => {
     axios.get("http://localhost:3001/teacher/auth", { withCredentials: true })
-            .then((response) => {
-                const { teacherId } = response.data;
-                
-                axios.get(`http://localhost:3001/teacher/subjects/${teacherId}`, {withCredentials: true})
-                    .then((teacherResponse) => {
-                      console.log(teacherResponse.data)
-                      setSubjects(teacherResponse.data);
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching teacher data:", error);
-                        
-                    });
-            })
-            .catch((error) => {
-                console.error("Error checking authentication:", error);
-                
-            });
+      .then((response) => {
+        const { teacherId } = response.data;
+        axios.get(`http://localhost:3001/teacher/subjects/${teacherId}`, { withCredentials: true })
+          .then((teacherResponse) => {
+            setSubjects(teacherResponse.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching teacher data:", error);
+          });
+      })
+      .catch((error) => {
+        console.error("Error checking authentication:", error);
+      });
   }, []);
-
 
   const addQuestion = () => {
     setQuestions([...questions, { text: '', answers: [] }]);
@@ -41,25 +36,39 @@ function CreateQuiz() {
 
   const addAnswer = (questionIndex) => {
     const newQuestions = questions.slice();
-    newQuestions[questionIndex].answers.push({ text: '' });
+    newQuestions[questionIndex].answers.push({ file: null });
     setQuestions(newQuestions);
   };
 
-  const handleAnswerChange = (questionIndex, answerIndex, value) => {
+  const handleAnswerChange = (questionIndex, answerIndex, file) => {
     const newQuestions = questions.slice();
-    newQuestions[questionIndex].answers[answerIndex].text = value;
+    newQuestions[questionIndex].answers[answerIndex].file = file;
     setQuestions(newQuestions);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('subjectId', selectedSubject);
+    formData.append('questions', JSON.stringify(questions));
+
+    questions.forEach((question, qIndex) => {
+      question.answers.forEach((answer, aIndex) => {
+        if (answer.file) {
+          formData.append(`questions[${qIndex}][answers][${aIndex}][file]`, answer.file);
+        }
+      });
+    });
+
     try {
-      await axios.post('http://localhost:3001/quiz/create', {
-        title,
-        questions,
-        subjectId: selectedSubject,
-      }, { withCredentials: true });
+      await axios.post('http://localhost:3001/quiz/create', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
 
       setTitle('');
       setQuestions([]);
@@ -98,10 +107,9 @@ function CreateQuiz() {
           {question.answers.map((answer, answerIndex) => (
             <div key={answerIndex}>
               <input
-                type="text"
-                value={answer.text}
-                onChange={(e) => handleAnswerChange(index, answerIndex, e.target.value)}
-                placeholder="Answer"
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => handleAnswerChange(index, answerIndex, e.target.files[0])}
                 required
               />
             </div>
