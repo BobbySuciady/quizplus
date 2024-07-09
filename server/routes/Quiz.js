@@ -80,6 +80,62 @@ router.get('/:id', validateToken, async (req, res) => {
 }
 });
 
+router.post('/submit/:id', validateToken, async (req, res) => {
+  const { id } =  req.params
+  const { answers } = req.body;
+  const studentId = req.user.id;
+
+  try {
+      for (const answer of answers) {
+          await StudentAnswer.create({
+              studentId,
+              questionId: answer.questionId,
+              quizId: id,
+              answer: answer.text
+          });
+      }
+
+      res.status(200).json({ message: 'Quiz submitted successfully' });
+  } catch (error) {
+      console.error('Error submitting quiz:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+router.get('/:id', validateToken, async (req, res) => {
+  const {id : quizId} = req.params
+  const {id: studentId} = req.user
+  try {
+    const quiz = await Quiz.findOne({
+        where: { id: quizId },
+        include: [{
+            model: Question,
+            as: 'questions'
+        }]
+    });
+
+    if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+    }
+
+    const studentAnswers = await StudentAnswer.findAll({
+        where: {
+            studentId: studentId,
+            quizId: quizId
+        }
+    });
+
+    res.json({
+        quiz,
+        studentAnswers
+    });
+} catch (error) {
+    console.error('Error fetching quiz details:', error);
+    res.status(500).json({ error: 'Error fetching quiz details' });
+}
+});
+
 router.post('/submit/:id', validateToken, upload.any(), async (req, res) => {
   const { id } = req.params;
   const studentId = req.user.id;
