@@ -14,6 +14,8 @@ app.use(cookieParser());
 // access all stuff in models
 const db = require('./models');
 
+app.use('/uploads', express.static(path.join(__dirname, '../client/uploads')));
+
 
 
 // Routers

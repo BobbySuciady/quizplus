@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import '../TeacherHome.css'; // Import the CSS file
 
 function TeacherHome() {
     const navigate = useNavigate();
@@ -39,11 +40,11 @@ function TeacherHome() {
     };
 
     if (!teacherData) {
-        return <div>Loading...</div>;
+        return <div className="loading">Loading...</div>;
     }
 
     return (
-        <div>
+        <div className="container">
             <h2>Welcome Teacher</h2>
             <p>{teacherData.message}</p>
             <p><Link to="/createquiz">Create Quiz</Link></p>

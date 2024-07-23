@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import CanvasDraw from 'react-canvas-draw';
 import 'katex/dist/katex.min.css';
 import '../Quiz.css'; // Ensure this CSS file is created and contains the necessary styles
 
@@ -16,6 +17,7 @@ function Quiz() {
     const [answers, setAnswers] = useState({});
     const [chatMessages, setChatMessages] = useState({});
     const [chatResponses, setChatResponses] = useState({});
+    const canvasRefs = useRef({});
 
     useEffect(() => {
         axios.get(`http://localhost:3001/quiz/${quizId}`, { withCredentials: true })
@@ -28,43 +30,50 @@ function Quiz() {
             });
     }, [quizId]);
 
-    const handleFileChange = (questionId, file) => {
-        setAnswers((prevAnswers) => ({
-            ...prevAnswers,
-            [questionId]: file
-        }));
+    const handleCanvasChange = (questionId) => {
+        const canvas = canvasRefs.current[questionId];
+        if (canvas) {
+            const drawingDataURL = canvas.getDataURL('image/png');
+            setAnswers(prevAnswers => ({
+                ...prevAnswers,
+                [questionId]: drawingDataURL
+            }));
+        }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-
+    
         const formData = new FormData();
-        formData.append('answers', JSON.stringify(Object.keys(answers).map(questionId => ({
+        const answersData = Object.keys(answers).map(questionId => ({
             questionId,
-            fileName: answers[questionId] ? answers[questionId].name : null
-        }))));
-
-        Object.keys(answers).forEach(questionId => {
-            if (answers[questionId]) {
-                formData.append(`answer_${questionId}`, answers[questionId]);
+            text: answers[questionId] ? answers[questionId].name : null
+        }));
+        formData.append('answers', JSON.stringify(answersData));
+    
+        // Add drawings to formData
+        for (const questionId in canvasRefs.current) {
+            const canvas = canvasRefs.current[questionId];
+            if (canvas) {
+                const drawingDataURL = canvas.getDataURL('image/png');
+                const drawingBlob = dataURLtoBlob(drawingDataURL);
+                formData.append(`answer_${questionId}`, drawingBlob, `${questionId}.png`);
             }
-        });
-
-        axios.post(`http://localhost:3001/quiz/submit/${quizId}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            withCredentials: true,
-        })
-        .then(() => {
-            alert('Quiz submitted successfully!');
-            axios.get('http://localhost:3001/student/auth', { withCredentials: true }).then((response) => {
-                navigate(`/${response.data.studentId}`);
+        }
+    
+        try {
+            await axios.post(`http://localhost:3001/quiz/submit/${quizId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                withCredentials: true,
             });
-        })
-        .catch((error) => {
+            alert('Quiz submitted successfully!');
+            const response = await axios.get('http://localhost:3001/student/auth', { withCredentials: true });
+            navigate(`/${response.data.studentId}`);
+        } catch (error) {
             console.error("Error submitting quiz:", error);
-        });
+        }
     };
 
     const handleChatChange = (questionId, message) => {
@@ -94,6 +103,28 @@ function Quiz() {
                    .replace(/\$(.*?)\$/g, '$$\n$1\n$$');
     };
 
+    const preprocessFeedback = (feedback) => {
+        return feedback
+            .replace(/\\\(/g, '$')
+            .replace(/\\\)/g, '$')
+            .replace(/\\\[/g, '$$')
+            .replace(/\\\]/g, '$$');
+    };
+
+    const dataURLtoBlob = (dataURL) => {
+        const binary = atob(dataURL.split(',')[1]);
+        const array = [];
+        for (let i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i));
+        }
+        return new Blob([new Uint8Array(array)], { type: 'image/png' });
+    };
+
+    const getStudentAnswerImageURL = (answer) => {
+        const correctedPath = answer.replace('..\\client\\uploads\\', 'uploads/');
+        return `http://localhost:3001/${correctedPath}`;
+    };
+
     if (!quiz) {
         return <div>Loading...</div>;
     }
@@ -119,7 +150,10 @@ function Quiz() {
                                 >
                                     {transformText(question.text)}
                                 </ReactMarkdown>
-                                <p>Your Answer: {studentAnswer ? studentAnswer.answer : 'Not answered'}</p>
+                                <p>Your Answer:</p>
+                                {studentAnswer && studentAnswer.answer && (
+                                    <img src={getStudentAnswerImageURL(studentAnswer.answer)} alt="Student Answer" />
+                                )}
                                 {studentAnswer && (
                                     <p className={`answer-status ${isCorrect ? 'correct' : 'incorrect'}`}>
                                         {isCorrect ? 'Correct' : 'Incorrect'}
@@ -132,7 +166,7 @@ function Quiz() {
                                             remarkPlugins={[remarkGfm, remarkMath]}
                                             rehypePlugins={[rehypeKatex]}
                                         >
-                                            {transformText(studentAnswer.feedback)}
+                                            {transformText(preprocessFeedback(studentAnswer.feedback))}
                                         </ReactMarkdown>
                                     </div>
                                 )}
@@ -149,7 +183,7 @@ function Quiz() {
                                                 remarkPlugins={[remarkGfm, remarkMath]}
                                                 rehypePlugins={[rehypeKatex]}
                                             >
-                                                {transformText(chatResponses[question.id])}
+                                                {transformText(preprocessFeedback(chatResponses[question.id]))}
                                             </ReactMarkdown>
                                         )}
                                     </div>
@@ -169,11 +203,14 @@ function Quiz() {
                                 >
                                     {transformText(question.text)}
                                 </ReactMarkdown>
-                                <input
-                                    type="file"
-                                    accept="image/*,application/pdf"
-                                    onChange={(e) => handleFileChange(question.id, e.target.files[0])}
-                                    required
+                                <CanvasDraw
+                                    ref={(canvas) => canvasRefs.current[question.id] = canvas}
+                                    canvasWidth={800}
+                                    canvasHeight={800}
+                                    brushRadius={2}
+                                    lazyRadius={0}
+                                    hideGrid={true}
+                                    onChange={() => handleCanvasChange(question.id)}
                                 />
                             </div>
                         ))}

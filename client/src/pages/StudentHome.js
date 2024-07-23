@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import '../StudentHome.css'; // Import the CSS file
 
 function StudentHome() {
     const navigate = useNavigate();
@@ -9,9 +10,6 @@ function StudentHome() {
 
     const QuizCard = ({ quiz }) => {
         const handleCardClick = () => {
-            // if (!quiz.submitted) {
-            //     navigate(`/quiz/${quiz.id}`);
-            // }
             navigate(`/quiz/${quiz.id}`);
         };
 
@@ -54,7 +52,7 @@ function StudentHome() {
     const submittedQuizzes = studentData.quizzes.filter(quiz => quiz.submitted);
 
     return (
-        <div style={{ maxHeight: '100vh', overflowY: 'auto' }}>
+        <div className="container">
             <h1>Welcome, Student</h1>
 
             <h2>Unfinished Quizzes:</h2>

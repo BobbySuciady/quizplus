@@ -80,27 +80,41 @@ router.get('/:id', validateToken, async (req, res) => {
 }
 });
 
-router.post('/submit/:id', validateToken, async (req, res) => {
-  const { id } =  req.params
-  const { answers } = req.body;
+router.post('/submit/:id', validateToken, upload.any(), async (req, res) => {
+  const { id } = req.params;
   const studentId = req.user.id;
 
   try {
-      for (const answer of answers) {
-          await StudentAnswer.create({
-              studentId,
-              questionId: answer.questionId,
-              quizId: id,
-              answer: answer.text
-          });
-      }
+    // Log the entire request body and files
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files);
+    
+    // Parse the answers from the form data
+    const answers = req.body.answers ? JSON.parse(req.body.answers) : [];
+    console.log('Parsed answers:', answers);
 
-      res.status(200).json({ message: 'Quiz submitted successfully' });
+    for (const answer of answers) {
+      const answerFile = req.files.find(file => file.fieldname === `answer_${answer.questionId}`);
+      console.log(`Creating StudentAnswer for question ${answer.questionId} by student ${studentId} with file ${answerFile ? answerFile.path : 'No file'}`);
+      
+      const studentAnswer = await StudentAnswer.create({
+        studentId,
+        questionId: answer.questionId,
+        quizId: id,
+        answer: answerFile ? answerFile.path : answer.text || ''
+      });
+
+      console.log(`StudentAnswer created: ${JSON.stringify(studentAnswer)}`);
+    }
+
+    res.status(200).json({ message: 'Quiz submitted successfully' });
   } catch (error) {
-      console.error('Error submitting quiz:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error submitting quiz:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+module.exports = router;
 
 
 router.get('/:id', validateToken, async (req, res) => {

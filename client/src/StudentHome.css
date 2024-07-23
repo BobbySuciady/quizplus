@@ -1,0 +1,84 @@
+/* StudentHome.css */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(-45deg, #004080, #007BFF, #00aaff, #00d4ff, #007BFF, #004080);
+    background-size: 400% 400%;
+    animation: gradientBG 30s ease infinite;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #004080;
+}
+
+.quizzes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.quiz-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.quiz-card:hover {
+    transform: scale(1.05);
+}
+
+.quiz-card.locked {
+    background-color: #e0e0e0;
+}
+
+.quiz-card h2 {
+    margin: 0 0 8px;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.quiz-card p {
+    margin: 4px 0;
+    color: #666;
+}
+
+.lock-message {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Add some global padding to the top of the page */
+body {
+    padding-top: 20px;
+}
+
